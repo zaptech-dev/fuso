@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>dev.zaptech.fuso</id>
+  <name>Fuso</name>
+  <summary>Track your team's timezones</summary>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <description>
+    <p>
+      Fuso is a lightweight desktop app for tracking your team's timezones.
+      It shows the current time for everyone you work with and can track
+      availability based on rotating schedules.
+    </p>
+  </description>
+  <url type="homepage">https://github.com/zaptech-dev/fuso</url>
+  <url type="bugtracker">https://github.com/zaptech-dev/fuso/issues</url>
+  <developer id="dev.zaptech">
+    <name>Zap Tech</name>
+  </developer>
+  <launchable type="desktop-id">dev.zaptech.fuso.desktop</launchable>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="0.1.0" date="2026-03-05">
+      <description>
+        <p>Initial release.</p>
+      </description>
+    </release>
+  </releases>
+</component>
