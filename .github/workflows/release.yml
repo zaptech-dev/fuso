@@ -9,12 +9,12 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  macos-app:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build
+      - name: Build Swift app
         run: swift build -c release
 
       - name: Bundle app
@@ -23,12 +23,77 @@ jobs:
           mkdir -p Fuso.app/Contents/Resources
           cp .build/release/Fuso Fuso.app/Contents/MacOS/Fuso
           cp Sources/Info.plist Fuso.app/Contents/Info.plist
-          zip -r Fuso.zip Fuso.app
+          zip -r Fuso-macos-app.zip Fuso.app
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Fuso-macos-app
+          path: Fuso-macos-app.zip
+
+  cli:
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-apple-darwin
+            os: macos-14
+            artifact: fuso-x86_64-apple-darwin
+          - target: aarch64-apple-darwin
+            os: macos-14
+            artifact: fuso-aarch64-apple-darwin
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            artifact: fuso-x86_64-unknown-linux-gnu
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            artifact: fuso-aarch64-unknown-linux-gnu
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Install cross-compilation tools
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+          echo '[target.aarch64-unknown-linux-gnu]' >> ~/.cargo/config.toml
+          echo 'linker = "aarch64-linux-gnu-gcc"' >> ~/.cargo/config.toml
+
+      - name: Build CLI
+        working-directory: cli
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Package
+        run: |
+          cd cli/target/${{ matrix.target }}/release
+          tar czf ${{ matrix.artifact }}.tar.gz fuso
+          mv ${{ matrix.artifact }}.tar.gz ../../../../
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.tar.gz
+
+  release:
+    needs: [macos-app, cli]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
 
       - name: Create release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ github.ref_name }} Fuso.zip \
+          gh release create ${{ github.ref_name }} \
+            Fuso-macos-app.zip \
+            fuso-x86_64-apple-darwin.tar.gz \
+            fuso-aarch64-apple-darwin.tar.gz \
+            fuso-x86_64-unknown-linux-gnu.tar.gz \
+            fuso-aarch64-unknown-linux-gnu.tar.gz \
+            --repo ${{ github.repository }} \
             --title "${{ github.ref_name }}" \
             --generate-notes

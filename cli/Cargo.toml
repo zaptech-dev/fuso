@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2021"
 description = "Track your team's timezones from the terminal"
 license = "MIT"
+repository = "https://github.com/zaptech-dev/fuso"
+homepage = "https://github.com/zaptech-dev/fuso"
+readme = "../README.md"
+keywords = ["timezone", "cli", "worldclock", "team"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 chrono = "0.4"
