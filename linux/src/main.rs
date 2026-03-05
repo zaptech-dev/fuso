@@ -254,7 +254,7 @@ fn main() {
 
     app.connect_startup(|_| {
         let provider = CssProvider::new();
-        provider.load_from_string(CSS);
+        provider.load_from_data(CSS);
         gtk4::style_context_add_provider_for_display(
             &gdk::Display::default().expect("could not get display"),
             &provider,
