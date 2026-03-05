@@ -1,0 +1,33 @@
+app-id: dev.zaptech.fuso
+runtime: org.gnome.Platform
+runtime-version: "47"
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: fuso-linux
+
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --filesystem=~/.config/fuso:create
+
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+  env:
+    CARGO_HOME: /run/build/fuso/cargo
+
+modules:
+  - name: fuso
+    buildsystem: simple
+    build-commands:
+      - cargo --offline fetch --manifest-path linux/Cargo.toml
+      - cargo --offline build --release --manifest-path linux/Cargo.toml
+      - install -Dm755 linux/target/release/fuso-linux /app/bin/fuso-linux
+      - install -Dm644 linux/data/dev.zaptech.fuso.desktop /app/share/applications/dev.zaptech.fuso.desktop
+      - install -Dm644 linux/data/dev.zaptech.fuso.metainfo.xml /app/share/metainfo/dev.zaptech.fuso.metainfo.xml
+      - install -Dm644 linux/data/icons/hicolor/scalable/apps/dev.zaptech.fuso.svg /app/share/icons/hicolor/scalable/apps/dev.zaptech.fuso.svg
+    sources:
+      - type: dir
+        path: ..
+      - cargo-sources.json
