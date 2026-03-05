@@ -8,13 +8,19 @@ Named after *fuso horario*, Portuguese for timezone.
 
 ## Install
 
+### Homebrew
+
+```bash
+brew tap zaptech-dev/tap
+brew install --cask fuso
+```
+
+### From source
+
 ```bash
 git clone https://github.com/zaptech-dev/fuso.git
 cd fuso
-swift build -c release
-mkdir -p Fuso.app/Contents/MacOS
-cp .build/release/Fuso Fuso.app/Contents/MacOS/Fuso
-cp -R Fuso.app /Applications/
+./install.sh
 open /Applications/Fuso.app
 ```
 

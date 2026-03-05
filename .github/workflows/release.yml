@@ -1,0 +1,34 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: swift build -c release
+
+      - name: Bundle app
+        run: |
+          mkdir -p Fuso.app/Contents/MacOS
+          mkdir -p Fuso.app/Contents/Resources
+          cp .build/release/Fuso Fuso.app/Contents/MacOS/Fuso
+          cp Sources/Info.plist Fuso.app/Contents/Info.plist
+          zip -r Fuso.zip Fuso.app
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ github.ref_name }} Fuso.zip \
+            --title "${{ github.ref_name }}" \
+            --generate-notes
