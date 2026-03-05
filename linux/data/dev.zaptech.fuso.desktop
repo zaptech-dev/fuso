@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Fuso
+Comment=Track your team's timezones
+Exec=fuso-linux
+Icon=dev.zaptech.fuso
+Terminal=false
+Type=Application
+Categories=Utility;Clock;
+Keywords=timezone;clock;team;world;
+StartupNotify=true

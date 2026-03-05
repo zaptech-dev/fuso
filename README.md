@@ -1,6 +1,6 @@
 # Fuso
 
-A lightweight macOS menu bar app for tracking your team's timezones. Native Swift, no Electron, no dependencies.
+A lightweight app for tracking your team's timezones. Native on macOS (Swift menu bar app) and Linux (GTK4 desktop app). No Electron, no dependencies.
 
 Fuso sits in your menu bar and shows the current time for everyone you work with. Optionally, it can track availability based on rotating schedules — useful for teams with members who have factory shifts, hospital rotations, or any recurring time blocks.
 
@@ -15,13 +15,48 @@ brew tap zaptech-dev/tap
 brew install --cask fuso
 ```
 
-### From source
+### From source (macOS)
 
 ```bash
 git clone https://github.com/zaptech-dev/fuso.git
 cd fuso
 ./install.sh
 open /Applications/Fuso.app
+```
+
+### Linux (Flatpak)
+
+```bash
+git clone https://github.com/zaptech-dev/fuso.git
+cd fuso
+./linux/build-flatpak.sh
+flatpak run dev.zaptech.fuso
+```
+
+Requires `flatpak`, `flatpak-builder`, and the GNOME SDK:
+
+```bash
+flatpak install flathub org.gnome.Platform//46 org.gnome.Sdk//46
+flatpak install flathub org.freedesktop.Sdk.Extension.rust-stable//24.08
+```
+
+### Linux (from source)
+
+```bash
+# Ubuntu/Debian: sudo apt install libgtk-4-dev
+# Fedora: sudo dnf install gtk4-devel
+# Arch: sudo pacman -S gtk4
+git clone https://github.com/zaptech-dev/fuso.git
+cd fuso/linux
+cargo build --release
+./target/release/fuso-linux
+```
+
+### CLI (all platforms)
+
+```bash
+cargo install fuso
+fuso
 ```
 
 Requires macOS 13+ and Swift 5.9+.

@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v0.1.0)'
+        required: true
 
 permissions:
   contents: write
@@ -80,6 +84,8 @@ jobs:
   release:
     needs: [macos-app, cli]
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -89,12 +95,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ github.ref_name }} \
+          gh release create $TAG \
             Fuso-macos-app.zip \
             fuso-x86_64-apple-darwin.tar.gz \
             fuso-aarch64-apple-darwin.tar.gz \
             fuso-x86_64-unknown-linux-gnu.tar.gz \
             fuso-aarch64-unknown-linux-gnu.tar.gz \
             --repo ${{ github.repository }} \
-            --title "${{ github.ref_name }}" \
+            --title "$TAG" \
             --generate-notes
