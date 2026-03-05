@@ -6,3 +6,4 @@ DerivedData/
 .DS_Store
 Fuso.app/
 thoughts/
+cli/target/
