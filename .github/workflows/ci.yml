@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build CLI
+        working-directory: cli
+        run: cargo build
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GTK4 dev dependencies
+        run: sudo apt-get update && sudo apt-get install -y libgtk-4-dev
+      - name: Build Linux app
+        working-directory: linux
+        run: cargo build
