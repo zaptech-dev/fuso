@@ -26,7 +26,8 @@ modules:
       - install -Dm755 linux/target/release/fuso-linux /app/bin/fuso-linux
       - install -Dm644 linux/data/dev.zaptech.fuso.desktop /app/share/applications/dev.zaptech.fuso.desktop
       - install -Dm644 linux/data/dev.zaptech.fuso.metainfo.xml /app/share/metainfo/dev.zaptech.fuso.metainfo.xml
+      - install -Dm644 linux/data/icons/hicolor/scalable/apps/dev.zaptech.fuso.svg /app/share/icons/hicolor/scalable/apps/dev.zaptech.fuso.svg
     sources:
       - type: dir
-        path: .
+        path: ..
       - cargo-sources.json
