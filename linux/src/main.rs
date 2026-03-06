@@ -1,6 +1,7 @@
-mod config;
-
-use config::{current_availability, load_config, local_tz, relative_offset, timezone_to_flag, Availability};
+use fuso_core::{
+    config_path, current_availability, load_config, local_tz, relative_offset, timezone_to_flag,
+    Availability, ClockEntry,
+};
 use chrono_tz::Tz;
 use glib::ControlFlow;
 use gtk4::prelude::*;
@@ -78,14 +79,13 @@ const CSS: &str = r#"
     }
 "#;
 
-fn build_clock_card(entry: &config::ClockEntry, now_utc: chrono::DateTime<chrono::Utc>, local_tz: Tz) -> GtkBox {
+fn build_clock_card(entry: &ClockEntry, now_utc: chrono::DateTime<chrono::Utc>, local_tz: Tz) -> GtkBox {
     let card = GtkBox::new(Orientation::Horizontal, 0);
     card.add_css_class("clock-card");
 
     let tz: Tz = entry.timezone.parse().unwrap_or(chrono_tz::UTC);
     let now_tz = now_utc.with_timezone(&tz);
 
-    // Left side: flag + name/city/status
     let left = GtkBox::new(Orientation::Horizontal, 10);
     left.set_hexpand(true);
 
@@ -122,7 +122,6 @@ fn build_clock_card(entry: &config::ClockEntry, now_utc: chrono::DateTime<chrono
     left.append(&info);
     card.append(&left);
 
-    // Right side: time + day/offset
     let right = GtkBox::new(Orientation::Vertical, 1);
     right.set_valign(Align::Center);
 
@@ -146,7 +145,6 @@ fn build_clock_card(entry: &config::ClockEntry, now_utc: chrono::DateTime<chrono
 fn build_ui(app: &Application) {
     let main_box = GtkBox::new(Orientation::Vertical, 0);
 
-    // Header
     let header = GtkBox::new(Orientation::Vertical, 2);
     header.set_margin_start(16);
     header.set_margin_end(16);
@@ -164,7 +162,6 @@ fn build_ui(app: &Application) {
     header.append(&subtitle);
     main_box.append(&header);
 
-    // Scrollable clock list
     let scroll = ScrolledWindow::new();
     scroll.set_vexpand(true);
     scroll.set_max_content_height(420);
@@ -177,14 +174,13 @@ fn build_ui(app: &Application) {
     scroll.set_child(Some(&list_box));
     main_box.append(&scroll);
 
-    // Bottom bar
     let bottom = GtkBox::new(Orientation::Horizontal, 16);
     bottom.add_css_class("bottom-bar");
 
     let config_btn = gtk4::Button::with_label("Config");
     config_btn.add_css_class("bottom-button");
     config_btn.connect_clicked(|_| {
-        let path = config::config_path();
+        let path = config_path();
         let _ = std::process::Command::new("xdg-open").arg(path).spawn();
     });
     bottom.append(&config_btn);
@@ -211,17 +207,14 @@ fn build_ui(app: &Application) {
         .child(&main_box)
         .build();
 
-    // Initial render
     refresh_clocks(&list_box, &subtitle);
 
-    // Auto-refresh every second
     let list_ref = list_box.clone();
     let sub_ref = subtitle.clone();
     let mut tick_count: u32 = 0;
     glib::timeout_add_local(std::time::Duration::from_secs(1), move || {
         tick_count += 1;
         refresh_clocks(&list_ref, &sub_ref);
-        // Reload config every 10 seconds
         if tick_count % 10 == 0 {
             refresh_clocks(&list_ref, &sub_ref);
         }
@@ -232,7 +225,6 @@ fn build_ui(app: &Application) {
 }
 
 fn refresh_clocks(list_box: &GtkBox, subtitle: &Label) {
-    // Remove existing children
     while let Some(child) = list_box.first_child() {
         list_box.remove(&child);
     }

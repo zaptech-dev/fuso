@@ -12,8 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build CLI
-        working-directory: cli
-        run: cargo build
+        run: cargo build -p fuso
 
   linux:
     runs-on: ubuntu-latest
@@ -22,5 +21,4 @@ jobs:
       - name: Install GTK4 dev dependencies
         run: sudo apt-get update && sudo apt-get install -y libgtk-4-dev
       - name: Build Linux app
-        working-directory: linux
-        run: cargo build
+        run: cargo build -p fuso-linux
