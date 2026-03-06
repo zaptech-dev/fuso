@@ -20,15 +20,17 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Swift app
+        working-directory: macos
         run: swift build -c release
 
       - name: Bundle app
+        working-directory: macos
         run: |
           mkdir -p Fuso.app/Contents/MacOS
           mkdir -p Fuso.app/Contents/Resources
           cp .build/release/Fuso Fuso.app/Contents/MacOS/Fuso
           cp Sources/Info.plist Fuso.app/Contents/Info.plist
-          zip -r Fuso-macos-app.zip Fuso.app
+          zip -r ../Fuso-macos-app.zip Fuso.app
 
       - uses: actions/upload-artifact@v4
         with:
@@ -67,14 +69,13 @@ jobs:
           echo 'linker = "aarch64-linux-gnu-gcc"' >> ~/.cargo/config.toml
 
       - name: Build CLI
-        working-directory: cli
-        run: cargo build --release --target ${{ matrix.target }}
+        run: cargo build --release -p fuso --target ${{ matrix.target }}
 
       - name: Package
         run: |
-          cd cli/target/${{ matrix.target }}/release
+          cd target/${{ matrix.target }}/release
           tar czf ${{ matrix.artifact }}.tar.gz fuso
-          mv ${{ matrix.artifact }}.tar.gz ../../../../
+          mv ${{ matrix.artifact }}.tar.gz ../../../
 
       - uses: actions/upload-artifact@v4
         with:

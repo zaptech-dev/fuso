@@ -6,11 +6,8 @@ description = "Fuso — track your team's timezones (Linux desktop app)"
 license = "MIT"
 
 [dependencies]
+fuso-core = { path = "../crates/fuso-core" }
 gtk4 = "0.9"
 chrono = "0.4"
 chrono-tz = "0.10"
-dirs = "6"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-iana-time-zone = "0.1"
 glib = "0.20"
